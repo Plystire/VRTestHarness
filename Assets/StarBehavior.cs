@@ -35,13 +35,15 @@ public class StarBehavior : InteractObject {
             // If auto-aiming, follow target
             if (autoAiming)
             {
-                float mag = rig.velocity.magnitude;
+                //float mag = rig.velocity.magnitude;
 
-                //GameObject go = new GameObject();
-                //go.transform.position = transform.position;
-                transform.LookAt(autoAimTarget.transform);
+                ////GameObject go = new GameObject();
+                ////go.transform.position = transform.position;
+                //float dist = (autoAimTarget.transform.position - transform.position).magnitude;
+                //transform.LookAt(autoAimTarget.transform.position + ((dist / mag) * -Physics.gravity));
 
-                rig.velocity = transform.forward * mag;
+                //rig.velocity = transform.forward * mag;
+                //rig.velocity = (rig.velocity / rig.velocity.magnitude) * mag;
 
                 //transform.rotation = go.transform.rotation;
 
@@ -134,7 +136,6 @@ public class StarBehavior : InteractObject {
             // Auto-aim logic
             //
             // Find object with lowest angle offset from our initial trajectory
-            List<GameObject> potentialTargets = new List<GameObject>();
             Transform objTrans;
             GameObject tmpGO = new GameObject();
             GameObject tmpVelGO = new GameObject();
@@ -151,7 +152,6 @@ public class StarBehavior : InteractObject {
                 tmpGO.transform.position = transform.position;
                 tmpGO.transform.LookAt(objTrans);
                 diffAngle = Quaternion.Angle(tmpVelGO.transform.rotation, tmpGO.transform.rotation);
-                Debug.Log("Checking auto-aim angle: " + diffAngle);
                 if (diffAngle < lowestDiff)
                 {
                     lowestDiff = diffAngle;
@@ -168,6 +168,21 @@ public class StarBehavior : InteractObject {
                 Debug.Log("Found best auto-aim target: " + bestTarget);
                 autoAiming = true;
                 autoAimTarget = bestTarget;
+                // Set velocity to make the shot!
+                float mag = rig.velocity.magnitude;
+                Debug.Log("VelMag: " + mag);
+
+                GameObject go = new GameObject();
+                go.transform.position = transform.position;
+                float dist = (autoAimTarget.transform.position - transform.position).magnitude;
+                float eta = dist / mag;
+                Debug.Log("ETA: " + eta);
+                go.transform.LookAt(autoAimTarget.transform.position);
+                Debug.Log("Gravity Compensation: " + (eta * -Physics.gravity));
+
+                rig.velocity = go.transform.forward * mag;
+                rig.velocity += -Physics.gravity * eta;
+                //rig.AddForce(-Physics.gravity * eta * rig.mass, ForceMode.Impulse);
             } else
             {
                 Debug.Log("Failed auto-aim: " + lowestDiff);
