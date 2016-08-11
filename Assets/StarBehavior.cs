@@ -42,23 +42,15 @@ public class StarBehavior : InteractObject {
         base.Update();
         if (IsInteracting())
         {   // Attach directly to hand
-            //WandController attachedWand = GetAttachedWand();
-            //transform.position = attachedWand.transform.position + attachCenterOffset;
-            //Vector3 temp = attachedWand.transform.rotation.eulerAngles;
-            //temp += attachAngleOffset;
-            //transform.rotation = Quaternion.Euler(temp);
-
+            // !!!! InteractObject does this now using SnapHold
             // Track our deltas using last position
-            SdeltaPos = transform.position - lastPos;
+            //SdeltaPos = transform.position - lastPos;
 
-            SdeltaRot = transform.rotation * Quaternion.Inverse(lastRot);
-            SdeltaRot.ToAngleAxis(out Sangle, out Saxis);
+            //SdeltaRot = transform.rotation * Quaternion.Inverse(lastRot);
+            //SdeltaRot.ToAngleAxis(out Sangle, out Saxis);
 
-            lastPos = transform.position;
-            lastRot = transform.rotation;
-            //transform.RotateAroundLocal(new Vector3(0.0f, 0.0f, 0.0f), 30.0f);
-            //transform.Rotate(new Vector3(30.0f, 0.0f, 0.0f));
-            //Debug.Log(transform.eulerAngles);
+            //lastPos = transform.position;
+            //lastRot = transform.rotation;
         } else
         {
             // Lower life until dead
@@ -99,16 +91,14 @@ public class StarBehavior : InteractObject {
         if (starWand) {
             Vector3 posOffset;
             Vector3 rotOffset;
-            Debug.Log("[StarBeh.BeginInter] Enter");
+            //Debug.Log("[StarBeh.BeginInter] Enter");
             starWand.getStarOffsets(this, out posOffset, out rotOffset);
-            Debug.Log("[StarBeh.BeginInter] posOffset: " + posOffset);
-            Debug.Log("[StarBeh.BeginInter] rotOffset: " + (wand.transform.rotation.eulerAngles + rotOffset));
-            // Transform to world coordinates
-            //posOffset = wand.transform.TransformPoint(posOffset);
+            //Debug.Log("[StarBeh.BeginInter] posOffset: " + posOffset);
+            //Debug.Log("[StarBeh.BeginInter] rotOffset: " + (wand.transform.rotation.eulerAngles + rotOffset));
 
-            Debug.Log("IntPt: " + GetInteractionPoint().rotation);
+            //Debug.Log("IntPt: " + GetInteractionPoint().rotation);
             SetInteractionPointLocal(posOffset, rotOffset);
-            Debug.Log("AfterIntPt: " + GetInteractionPoint().rotation);
+            //Debug.Log("AfterIntPt: " + GetInteractionPoint().rotation);
         } else
         {
             Debug.Log("[StarBehavior.BeginInteraction] StarWand not set!");
@@ -131,42 +121,31 @@ public class StarBehavior : InteractObject {
 
     public override void EndInteraction(WandController wand)
     {
+        base.EndInteraction(wand);
         if (IsInteracting())
-        {   // Update physics to follow attached wand
-            WandController attachedWand = GetAttachedWand();
-            Rigidbody trigidbody = GetComponent<Rigidbody>();
-            float tvelocityFactor = GetVelocityFactor();
-
-            trigidbody.velocity = SdeltaPos * tvelocityFactor * Time.fixedDeltaTime * throwingVelocityMultiplier;
-            trigidbody.angularVelocity = (Time.fixedDeltaTime * Sangle * Saxis) * GetRotationFactor() * throwingVelocityMultiplier;
-
-#if DEBUG
-            Debug.Log("wandPos: " + attachedWand.transform.position);
-            Debug.Log("Pos: " + trigidbody.velocity + " ; delta: " + SdeltaPos + " ; factor: " + tvelocityFactor + " ; time: " + Time.fixedDeltaTime);
-            Debug.Log("Rot: " + trigidbody.angularVelocity);
-#endif
+        {
             #region AutoAim
             // ====================================
             // Auto-aim logic
             //
             // Collect potential targets by filtering through projection axis distance, and collecting positive results (objects in front of velocity projection)
-            List<GameObject> potentialTargets = new List<GameObject>();
-            Vector3 calcVel;
-            Transform objTrans;
-            GameObject tmpGO = new GameObject();
-            Quaternion lowestDiff;
-            GameObject bestTarget = null;
-            foreach (GameObject obj in GameObject.FindGameObjectsWithTag("AutoAimTarget"))
-            {   // Find any and all potential autoAim targets
-                objTrans = obj.GetComponentInParent<Transform>();
-                //calcVel = objTrans.position - transform.loo
-                tmpGO.transform.position = transform.position;
-                tmpGO.transform.LookAt(objTrans);
-                Quaternion diff = transform.rotation * Quaternion.Inverse(tmpGO.transform.rotation);
-            }
+            //List<GameObject> potentialTargets = new List<GameObject>();
+            //Vector3 calcVel;
+            //Transform objTrans;
+            //GameObject tmpGO = new GameObject();
+            //Quaternion lowestDiff;
+            //GameObject bestTarget = null;
+            //foreach (GameObject obj in GameObject.FindGameObjectsWithTag("AutoAimTarget"))
+            //{   // Find any and all potential autoAim targets
+            //    break;
+            //    objTrans = obj.GetComponentInParent<Transform>();
+            //    //calcVel = objTrans.position - transform.loo
+            //    tmpGO.transform.position = transform.position;
+            //    tmpGO.transform.LookAt(objTrans);
+            //    Quaternion diff = transform.rotation * Quaternion.Inverse(tmpGO.transform.rotation);
+            //}
             #endregion
         }
-        base.EndInteraction(wand);
 
         // Remove star from StarWand
         if (starWand)

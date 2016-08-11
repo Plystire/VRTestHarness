@@ -38,7 +38,6 @@ GameObject:
   - 4: {fileID: 4000011397531248}
   - 33: {fileID: 33000010109540648}
   - 65: {fileID: 65000014042267564}
-  - 23: {fileID: 23000014237532170}
   - 54: {fileID: 54000013354921072}
   - 114: {fileID: 114000012177903776}
   m_Layer: 0
@@ -75,35 +74,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4000011397531248}
   m_RootOrder: 0
---- !u!23 &23000014237532170
-MeshRenderer:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012844349480}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  m_SubsetIndices: 
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_SelectedWireframeHidden: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
 --- !u!33 &33000010109540648
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -178,3 +148,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bb3e1343a4b82045be4d53ae362be17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  thresholdVelocity: 50

@@ -16,10 +16,12 @@ public class InteractObject : MonoBehaviour {
     private float velocityFactor = 20000.0f;
     public float GetVelocityFactor() { return velocityFactor; }
     private Vector3 deltaPos;
+    private Vector3 lastPos;
     public Vector3 GetDeltaPos() { return deltaPos; }
     private float rotationFactor = 600.0f;
     public float GetRotationFactor() { return rotationFactor; }
     private Quaternion deltaRot;
+    private Quaternion lastRot;
     public Quaternion GetDeltaRot() { return deltaRot; }
     private float angle;
     private Vector3 axis;
@@ -48,7 +50,10 @@ public class InteractObject : MonoBehaviour {
             velocityFactor /= rigidbody.mass;
             rotationFactor /= rigidbody.mass;
         }
-	}
+
+        lastPos = new Vector3();
+        lastRot = new Quaternion();
+    }
 	
 	// Update is called once per frame
 	public void Update () {
@@ -84,6 +89,15 @@ public class InteractObject : MonoBehaviour {
                     rig.velocity = new Vector3();
                     rig.angularVelocity = new Vector3();
                 }
+
+                // Track our deltas for when we let go
+                deltaPos = transform.position - lastPos;
+
+                deltaRot = transform.rotation * Quaternion.Inverse(lastRot);
+                deltaRot.ToAngleAxis(out angle, out axis);
+
+                lastPos = transform.position;
+                lastRot = transform.rotation;
             }
         }
 	}
@@ -155,11 +169,19 @@ public class InteractObject : MonoBehaviour {
 
     public virtual void EndInteraction(WandController wand)
     {
-        //if (wand == attachedWand)
-        //{
-            attachedWand = null;
-            currentlyInteracting = false;
-        //}
+        if (IsInteracting() && snapHold)
+        {   // Update physics to follow attached wand when snapHold, otherwise physics won't be applied
+            rigidbody.velocity = deltaPos * velocityFactor * Time.fixedDeltaTime;
+            rigidbody.angularVelocity = (Time.fixedDeltaTime * angle * axis) * rotationFactor;
+
+#if DEBUG
+            Debug.Log("wandPos: " + attachedWand.transform.position);
+            Debug.Log("Pos: " + rigidbody.velocity + " ; delta: " + deltaPos + " ; factor: " + velocityFactor + " ; time: " + Time.fixedDeltaTime);
+            Debug.Log("Rot: " + rigidbody.angularVelocity);
+#endif
+        }
+        attachedWand = null;
+        currentlyInteracting = false;
     }
 
     public bool IsInteracting()

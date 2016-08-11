@@ -28,10 +28,10 @@ public class ThrowingStar_WandController : MonoBehaviour {
         starPosOffset[2] = new Vector3(0.0f, -0.05f, -0.07f);
         starPosOffset[3] = new Vector3(0.0f, -0.05f, -0.094f);
         // Rotation Offsets
-        starRotOffset[0] = new Vector3(40.0f, 0.0f, 0.0f);
-        starRotOffset[1] = new Vector3(47.5f, 0.0f, 0.0f);
-        starRotOffset[2] = new Vector3(55.0f, 0.0f, 0.0f);
-        starRotOffset[3] = new Vector3(62.5f, 0.0f, 0.0f);
+        starRotOffset[0] = new Vector3(40.0f, 0.0f, 90.0f);
+        starRotOffset[1] = new Vector3(47.5f, 0.0f, 90.0f);
+        starRotOffset[2] = new Vector3(55.0f, 0.0f, 90.0f);
+        starRotOffset[3] = new Vector3(62.5f, 0.0f, 90.0f);
     }
 	
 	// Update is called once per frame

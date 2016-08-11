@@ -3,6 +3,8 @@ using System.Collections;
 
 public class StickyCollider : MonoBehaviour {
 
+    public float thresholdVelocity = 0.0f;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -16,7 +18,8 @@ public class StickyCollider : MonoBehaviour {
     void OnTriggerEnter(Collider col)
     {
         Rigidbody rig = GetComponentInParent<Rigidbody>();
-        //if(rig.velocity.magnitude < )
+        if (rig && rig.velocity.magnitude < thresholdVelocity)
+            return; // Don't stick if we're not moving fast enough
         CanStickTo cst = col.GetComponent<CanStickTo>();
 
         Debug.Log("[StickyCollider.OnTriggerEnter] " + cst);
