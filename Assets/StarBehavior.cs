@@ -8,32 +8,19 @@ public class StarBehavior : InteractObject {
 
     private ThrowingStar_WandController starWand;
 
+    public float maxAutoAimAngle = 10.0f;
     public float throwingVelocityMultiplier = 1.0f;
-
-    public Vector3 attachAngleOffset;
-    public Vector3 attachCenterOffset;
 
     public float lifeSpan = 5.0f;
 
-    private Vector3 SdeltaPos;
-    private Vector3 lastPos;
-    private Quaternion SdeltaRot;
-    private Quaternion lastRot;
-
-    private float Sangle;
-    private Vector3 Saxis;
+    private bool autoAiming = false;
+    private GameObject autoAimTarget = null;
 
     // Use this for initialization
     new void Start () {
         base.Start();
 
         rig = GetComponent<Rigidbody>();
-
-        SdeltaPos = new Vector3();
-        SdeltaRot = new Quaternion();
-
-        lastPos = new Vector3();
-        lastRot = new Quaternion();
 	}
 	
 	// Update is called once per frame
@@ -41,18 +28,26 @@ public class StarBehavior : InteractObject {
     {
         base.Update();
         if (IsInteracting())
-        {   // Attach directly to hand
-            // !!!! InteractObject does this now using SnapHold
-            // Track our deltas using last position
-            //SdeltaPos = transform.position - lastPos;
-
-            //SdeltaRot = transform.rotation * Quaternion.Inverse(lastRot);
-            //SdeltaRot.ToAngleAxis(out Sangle, out Saxis);
-
-            //lastPos = transform.position;
-            //lastRot = transform.rotation;
+        {   //
         } else
-        {
+        {   // Star is active!
+
+            // If auto-aiming, follow target
+            if (autoAiming)
+            {
+                float mag = rig.velocity.magnitude;
+
+                //GameObject go = new GameObject();
+                //go.transform.position = transform.position;
+                transform.LookAt(autoAimTarget.transform);
+
+                rig.velocity = transform.forward * mag;
+
+                //transform.rotation = go.transform.rotation;
+
+                //Destroy(go);
+            }
+
             // Lower life until dead
             lifeSpan -= Time.deltaTime;
             if (lifeSpan <= 0.0f)
@@ -121,29 +116,62 @@ public class StarBehavior : InteractObject {
 
     public override void EndInteraction(WandController wand)
     {
+        bool wasInteracting = IsInteracting();
+
         base.EndInteraction(wand);
-        if (IsInteracting())
-        {
+
+        if (wasInteracting)
+        {   // Provide throwingMultiplier impulse boost
+            Rigidbody rig = GetComponent<Rigidbody>();
+            if (rig)
+            {
+                rig.velocity *= throwingVelocityMultiplier;
+                rig.angularVelocity *= throwingVelocityMultiplier;
+            }
+
             #region AutoAim
             // ====================================
             // Auto-aim logic
             //
-            // Collect potential targets by filtering through projection axis distance, and collecting positive results (objects in front of velocity projection)
-            //List<GameObject> potentialTargets = new List<GameObject>();
-            //Vector3 calcVel;
-            //Transform objTrans;
-            //GameObject tmpGO = new GameObject();
-            //Quaternion lowestDiff;
-            //GameObject bestTarget = null;
-            //foreach (GameObject obj in GameObject.FindGameObjectsWithTag("AutoAimTarget"))
-            //{   // Find any and all potential autoAim targets
-            //    break;
-            //    objTrans = obj.GetComponentInParent<Transform>();
-            //    //calcVel = objTrans.position - transform.loo
-            //    tmpGO.transform.position = transform.position;
-            //    tmpGO.transform.LookAt(objTrans);
-            //    Quaternion diff = transform.rotation * Quaternion.Inverse(tmpGO.transform.rotation);
-            //}
+            // Find object with lowest angle offset from our initial trajectory
+            List<GameObject> potentialTargets = new List<GameObject>();
+            Transform objTrans;
+            GameObject tmpGO = new GameObject();
+            GameObject tmpVelGO = new GameObject();
+            float diffAngle;
+            float lowestDiff = float.MaxValue;
+            GameObject bestTarget = null;
+            
+            // Orient our temp velocity object to aim in the direction of our velocity
+            tmpVelGO.transform.LookAt(transform.position + rig.velocity);
+
+            foreach (GameObject obj in GameObject.FindGameObjectsWithTag("AutoAimTarget"))
+            {   // Filter out best target
+                objTrans = obj.GetComponentInParent<Transform>();
+                tmpGO.transform.position = transform.position;
+                tmpGO.transform.LookAt(objTrans);
+                diffAngle = Quaternion.Angle(tmpVelGO.transform.rotation, tmpGO.transform.rotation);
+                Debug.Log("Checking auto-aim angle: " + diffAngle);
+                if (diffAngle < lowestDiff)
+                {
+                    lowestDiff = diffAngle;
+                    bestTarget = obj;
+                }
+            }
+
+            Destroy(tmpGO);
+            Destroy(tmpVelGO);
+
+            // If best target angle is lower than acceptable amount, AUTO-AIM!!!
+            if (bestTarget && lowestDiff <= maxAutoAimAngle)
+            {
+                Debug.Log("Found best auto-aim target: " + bestTarget);
+                autoAiming = true;
+                autoAimTarget = bestTarget;
+            } else
+            {
+                Debug.Log("Failed auto-aim: " + lowestDiff);
+            }
             #endregion
         }
 
