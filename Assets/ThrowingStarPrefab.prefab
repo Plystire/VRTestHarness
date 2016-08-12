@@ -244,8 +244,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stickyPickup: 0.5
   snapHold: 1
-  maxAutoAimAngle: 20
-  throwingVelocityMultiplier: 1
+  maxAutoAimAngle: 0
+  throwingVelocityMultiplier: 1.75
   lifeSpan: 5
 --- !u!137 &137000011800978742
 SkinnedMeshRenderer:

@@ -37,6 +37,7 @@ public class StickyCollider : MonoBehaviour {
                 rig.velocity = new Vector3();
                 rig.angularVelocity = new Vector3();
                 rig.isKinematic = true;
+                rig.detectCollisions = false;       // DOn't detect collisions anymore
             }
 
             // Set parent to buffer object so we can retain orientation

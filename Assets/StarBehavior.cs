@@ -170,19 +170,15 @@ public class StarBehavior : InteractObject {
                 autoAimTarget = bestTarget;
                 // Set velocity to make the shot!
                 float mag = rig.velocity.magnitude;
-                Debug.Log("VelMag: " + mag);
 
                 GameObject go = new GameObject();
                 go.transform.position = transform.position;
                 float dist = (autoAimTarget.transform.position - transform.position).magnitude;
                 float eta = dist / mag;
-                Debug.Log("ETA: " + eta);
                 go.transform.LookAt(autoAimTarget.transform.position);
-                Debug.Log("Gravity Compensation: " + (eta * -Physics.gravity));
-
+                
                 rig.velocity = go.transform.forward * mag;
-                rig.velocity += -Physics.gravity * eta;
-                //rig.AddForce(-Physics.gravity * eta * rig.mass, ForceMode.Impulse);
+                rig.velocity += -Physics.gravity * (eta / 2.0f);    // Divide by 2 because we only want to counteract gravity for half of our travel time... that is, we reach our peak at half-time, like we should :)
             } else
             {
                 Debug.Log("Failed auto-aim: " + lowestDiff);
